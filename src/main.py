@@ -8,6 +8,7 @@ import numpy as np
 import sys
 from itertools import chain
 
+
 import pygame
 
 from pySpriteWorld.gameclass import Game,check_init_game_done
