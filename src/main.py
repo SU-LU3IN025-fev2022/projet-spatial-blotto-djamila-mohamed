@@ -3,11 +3,10 @@
 # Nicolas, 2021-03-05
 from __future__ import absolute_import, print_function, unicode_literals
 
-import random 
+import random
 import numpy as np
 import sys
 from itertools import chain
-
 
 import pygame
 
@@ -46,7 +45,7 @@ def init(_boardname=None):
     game.fps = 5  # frames per second
     game.mainiteration()
     player = game.player
-    
+
 def main():
 
     #for arg in sys.argv:
@@ -57,93 +56,93 @@ def main():
     print (iterations)
 
     init()
-    
 
-    
+
+
     #-------------------------------
     # Initialisation
     #-------------------------------
-    
+
     nbLignes = game.spriteBuilder.rowsize
     nbCols = game.spriteBuilder.colsize
-       
+
     print("lignes", nbLignes)
     print("colonnes", nbCols)
-    
-    
+
+
     players = [o for o in game.layers['joueur']]
     nbPlayers = len(players)
     print("Trouvé ", nbPlayers, " militants")
-    
-       
-           
+
+
+
     # on localise tous les états initiaux (loc du joueur)
     # positions initiales des joueurs
     initStates = [o.get_rowcol() for o in players]
     print ("Init states:", initStates)
-    
+
     # on localise tous les secteurs d'interet (les votants)
     # sur le layer ramassable
     goalStates = [o.get_rowcol() for o in game.layers['ramassable']]
     print ("Goal states:", goalStates)
-    
-        
+
+
     # on localise tous les murs
     # sur le layer obstacle
     wallStates = [w.get_rowcol() for w in game.layers['obstacle']]
     print ("Wall states:", wallStates)
-    
+
     def legal_position(row,col):
         # une position legale est dans la carte et pas sur un mur
         return ((row,col) not in wallStates) and row>=0 and row<nbLignes and col>=0 and col<nbCols
-    
-    
-    
-        
+
+
+
+
     #-------------------------------
-    # Attributaion aleatoire des fioles 
+    # Attributaion aleatoire des fioles
     #-------------------------------
-    
+
     objectifs = goalStates
     random.shuffle(objectifs)
     print("Objectif joueur 0", objectifs[0])
     print("Objectif joueur 1", objectifs[1])
 
-    
+
     #-------------------------------
-    # Carte demo 
-    # 2 joueurs 
+    # Carte demo
+    # 2 joueurs
     # Joueur 0: A*
     # Joueur 1: random walk
     #-------------------------------
-    
+
     #-------------------------------
     # calcul A* pour le joueur 0
     #-------------------------------
-    
 
-    
-    g =np.ones((nbLignes,nbCols),dtype=bool)  # par defaut la matrice comprend des True  
+
+
+    g =np.ones((nbLignes,nbCols),dtype=bool)  # par defaut la matrice comprend des True
     for w in wallStates:            # putting False for walls
         g[w]=False
     p = ProblemeGrid2D(initStates[0],objectifs[0],g,'manhattan')
     path = probleme.astar(p)
     print ("Chemin trouvé:", path)
-        
-    
+
+
     #-------------------------------
-    # Boucle principale de déplacements 
+    # Boucle principale de déplacements
     #-------------------------------
-    
-            
+
+
     posPlayers = initStates
 
     for i in range(iterations):
-        
+
         # on fait bouger chaque joueur séquentiellement
-        
-        # Joeur 0: suit son chemin trouve avec A* 
-        
+
+        # Joeur 0: suit son chemin trouve avec A*
+
         row,col = path[i]
         posPlayers[0]=(row,col)
         players[0].set_rowcol(row,col)
@@ -151,9 +150,9 @@ def main():
         if (row,col) == objectifs[0]:
             print("le joueur 0 a atteint son but!")
             break
-        
+
         # Joueur 1: fait du random walk
-        
+
         row,col = posPlayers[1]
 
         while True: # tant que pas legal on retire une position
@@ -164,41 +163,38 @@ def main():
                 break
         players[1].set_rowcol(next_row,next_col)
         print ("pos 1:", next_row,next_col)
-    
+
         col=next_col
         row=next_row
         posPlayers[1]=(row,col)
-            
+
         if (row,col) == objectifs[1]:
             print("le joueur 1 a atteint son but!")
             break
-            
-            
-        
+
+
+
         # on passe a l'iteration suivante du jeu
         game.mainiteration()
 
-                
-        
-            
-    
+
+
+
+
     pygame.quit()
-    
-    
-    
-    
+
+
+
+
     #-------------------------------
-    
-        
-        
-    
-    
-        
-    
-   
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     main()
-    
-
-
