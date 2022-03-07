@@ -104,31 +104,36 @@ def main():
     # Attributaion aleatoire des fioles
     #-------------------------------
 
-    objectifs = goalStates
-    random.shuffle(objectifs)
-    print("Objectif joueur 0", objectifs[0])
-    print("Objectif joueur 1", objectifs[1])
+    objectifs = [] # liste de tuples
+    for i in range (nbPlayers):
+        objectifs.append(random.choice(goalStates))
 
 
     #-------------------------------
     # Carte demo
-    # 2 joueurs
-    # Joueur 0: A*
-    # Joueur 1: random walk
+    # nbPlayers joueurs
+    # Joueur i: A*
     #-------------------------------
 
     #-------------------------------
-    # calcul A* pour le joueur 0
+    # calcul A* pour chaque joueur i
     #-------------------------------
 
+    ps = [] # liste de problemes pour chaque joueur
+    paths = [] # liste de chemins pour chaque joueur
 
+    for i in range (len(players)):
 
-    g =np.ones((nbLignes,nbCols),dtype=bool)  # par defaut la matrice comprend des True
-    for w in wallStates:            # putting False for walls
-        g[w]=False
-    p = ProblemeGrid2D(initStates[0],objectifs[0],g,'manhattan')
-    path = probleme.astar(p)
-    print ("Chemin trouvé:", path)
+        print("Objectif joueur ", objectifs[i])
+
+        g = np.ones((nbLignes,nbCols),dtype=bool)  # par defaut la matrice comprend des True
+        for w in wallStates:            # putting False for walls
+            g[w]=False
+        p = ProblemeGrid2D(initStates[i],objectifs[i],g,'manhattan')
+        ps.append(p)
+        path = probleme.astar(p)
+        paths.append(path)
+        print ("Chemin trouvé:", path)
 
 
     #-------------------------------
@@ -138,49 +143,24 @@ def main():
 
     posPlayers = initStates
 
-    for i in range(iterations):
+    for p in range (nbPlayers): # on fait jouer chaque joueur
+        for i in range(iterations):
 
-        # on fait bouger chaque joueur séquentiellement
+            # on fait bouger chaque joueur séquentiellement
 
-        # Joeur 0: suit son chemin trouve avec A*
+            # Joeur 0: suit son chemin trouve avec A*
 
-        row,col = path[i]
-        posPlayers[0]=(row,col)
-        players[0].set_rowcol(row,col)
-        print ("pos 0:", row,col)
-        if (row,col) == objectifs[0]:
-            print("le joueur 0 a atteint son but!")
-            break
-
-        # Joueur 1: fait du random walk
-
-        row,col = posPlayers[1]
-
-        while True: # tant que pas legal on retire une position
-            x_inc,y_inc = random.choice([(0,1),(0,-1),(1,0),(-1,0)])
-            next_row = row+x_inc
-            next_col = col+y_inc
-            if legal_position(next_row,next_col):
+            row,col = paths[p][i]
+            posPlayers[p]=(row,col)
+            players[p].set_rowcol(row,col)
+            print ("pos " +str(p)+ " :", row,col)
+            if (row,col) == objectifs[p]:
+                print("le joueur "+str(p)+" a atteint son but!")
                 break
-        players[1].set_rowcol(next_row,next_col)
-        print ("pos 1:", next_row,next_col)
-
-        col=next_col
-        row=next_row
-        posPlayers[1]=(row,col)
-
-        if (row,col) == objectifs[1]:
-            print("le joueur 1 a atteint son but!")
-            break
 
 
-
-        # on passe a l'iteration suivante du jeu
-        game.mainiteration()
-
-
-
-
+            # on passe a l'iteration suivante du jeu
+            game.mainiteration()
 
     pygame.quit()
 
