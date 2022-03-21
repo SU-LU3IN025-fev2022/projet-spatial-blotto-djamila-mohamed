@@ -141,26 +141,44 @@ def main():
     #-------------------------------
 
 
+    nextStep = [0 for x in players]
+    but_atteint = [False for x in players]
     posPlayers = initStates
 
-    for p in range (nbPlayers): # on fait jouer chaque joueur
-        for i in range(iterations):
+    for i in range(iterations):
 
-            # on fait bouger chaque joueur séquentiellement
+        for p in range (nbPlayers): # on fait jouer chaque joueur
 
-            # Joeur 0: suit son chemin trouve avec A*
+            if not(but_atteint[p]):
+                row,col = paths[p][nextStep[p]]
+                while True: # tant que pas legal on retire une position
+                    x_inc,y_inc = random.choice([(0,1),(0,-1),(1,0),(-1,0)])
+                    next_row = row+x_inc
+                    next_col = col+y_inc
+                    if legal_position(next_row,next_col):
+                        break
+                players[p].set_rowcol(next_row,next_col)
+                print ("pos " +str(p)+ " :", row,col)
+                if (row,col) == objectifs[p]:
+                    print("le joueur "+str(p)+" a atteint son but!")
+                    but_atteint[p] = True
+                    break
+                nextStep[p]+=1
 
-            row,col = paths[p][i]
-            posPlayers[p]=(row,col)
-            players[p].set_rowcol(row,col)
-            print ("pos " +str(p)+ " :", row,col)
-            if (row,col) == objectifs[p]:
-                print("le joueur "+str(p)+" a atteint son but!")
+        fini = False
+        for atteint in but_atteint:
+            fini = False
+            if not(atteint):
                 break
+            else :
+                fini = True
 
+        if fini:
+            print("tout le monde a fini")
+            break
 
             # on passe a l'iteration suivante du jeu
-            game.mainiteration()
+        game.mainiteration()
 
     pygame.quit()
 
