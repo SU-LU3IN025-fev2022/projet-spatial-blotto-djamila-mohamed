@@ -185,8 +185,6 @@ def main():
 
     pygame.quit()
 
-    # nom de l'electeur, score pour le parti 1, score pour le parti 2
-    parti1 = [[x, 0, 0] for x in matrice_resultats]
 
     print("RESULTATS")
     for p in range(len(objectifs)):
@@ -194,10 +192,12 @@ def main():
 
     print(matrice_resultats)
 
+
     # on considere que les nombre pairs sont le parti 1 et le reste parti 2
     for r in matrice_resultats:
         for p in r[1:]:
             if p%2 == 0:
+                print("d,lzqd,")
 
 
     #-------------------------------
