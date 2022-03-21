@@ -43,7 +43,7 @@ def init(_boardname=None):
     game = Game('./Cartes/' + name + '.json', SpriteBuilder)
     game.O = Ontology(True, 'SpriteSheet-32x32/tiny_spritesheet_ontology.csv')
     game.populate_sprite_names(game.O)
-    game.fps = 5  # frames per second
+    game.fps = 10 # frames per second
     game.mainiteration()
     player = game.player
 
@@ -144,11 +144,12 @@ def main():
     nextStep = [0 for x in players]
     but_atteint = [False for x in players]
     posPlayers = initStates
+    # les militants sont des lettres de l'alphabet (allant de a à e)
+    matrice_resultats = [[chr(x)] for x in range(ord('a'), ord('f'))]
 
     for i in range(iterations):
 
         for p in range (nbPlayers): # on fait jouer chaque joueur
-
             if not(but_atteint[p]):
                 row,col = paths[p][nextStep[p]]
                 while True: # tant que pas legal on retire une position
@@ -180,9 +181,23 @@ def main():
             # on passe a l'iteration suivante du jeu
         game.mainiteration()
 
+
+
     pygame.quit()
 
+    # nom de l'electeur, score pour le parti 1, score pour le parti 2
+    parti1 = [[x, 0, 0] for x in matrice_resultats]
 
+    print("RESULTATS")
+    for p in range(len(objectifs)):
+        matrice_resultats[goalStates.index(objectifs[p])].append(p)
+
+    print(matrice_resultats)
+
+    # on considere que les nombre pairs sont le parti 1 et le reste parti 2
+    for r in matrice_resultats:
+        for p in r[1:]:
+            if p%2 == 0:
 
 
     #-------------------------------

@@ -121,7 +121,8 @@ def main():
 
     #-------------------------------
     # Carte demo
-    # 14 joueurs, se deplacent avec astar
+    # 14 militants, se deplacent avec astar
+    # 5 electeurs
     #-------------------------------
 
     liste_path = []
@@ -197,3 +198,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# Combien de partis ? combien de militants par parti ?
