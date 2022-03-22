@@ -145,7 +145,6 @@ def main():
     but_atteint = [False for x in players]
     posPlayers = initStates
     # les militants sont des lettres de l'alphabet (allant de a à e)
-    matrice_resultats = [[chr(x)] for x in range(ord('a'), ord('f'))]
 
     for i in range(iterations):
 
@@ -186,20 +185,36 @@ def main():
     pygame.quit()
 
 
-    print("RESULTATS")
+    print("\n----------------RESULTATS----------------\n")
+    matrice_resultats = [[chr(x)] for x in range(ord('a'), ord('f'))]
     for p in range(len(objectifs)):
         matrice_resultats[goalStates.index(objectifs[p])].append(p)
 
-    print(matrice_resultats)
-
-
     # on considere que les nombre pairs sont le parti 1 et le reste parti 2
+    gagne_parti1 = 0
+    gagne_parti2 = 0
     for r in matrice_resultats:
+        nombre_parti1 = 0
+        nombre_parti2 = 0
         for p in r[1:]:
             if p%2 == 0:
-                print("d,lzqd,")
+                nombre_parti1+=1
+            else:
+                nombre_parti2+=1
+        if nombre_parti1 > nombre_parti2:
+            gagne_parti1+=1
+        elif nombre_parti2 > nombre_parti1:
+            gagne_parti2+=1
 
+    print("le parti 1 a remporté "+str(gagne_parti1)+" voix")
+    print("le parti 2 a remporté "+str(gagne_parti2)+" voix")
 
+    if gagne_parti1 > gagne_parti2:
+        print("le gagnant est le parti 1")
+    elif gagne_parti1 < gagne_parti2:
+        print("le gagnant est le parti 2")
+    else:
+        print("les deux partis sont à égalité")
     #-------------------------------
 
 
