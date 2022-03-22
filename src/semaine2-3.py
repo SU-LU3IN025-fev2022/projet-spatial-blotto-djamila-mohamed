@@ -6,6 +6,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import random
 import numpy as np
 import sys
+import time
 from itertools import chain
 
 
@@ -35,6 +36,7 @@ from search import probleme
 # ---- Main                ----
 # ---- ---- ---- ---- ---- ----
 
+jours = 5
 game = Game()
 
 def init(_boardname=None):
@@ -108,10 +110,10 @@ def main():
     joueur_objectif = []
 
     #-------------------------------
-    # Application des strategies sur les militants
+    # Application des strategies des militants
     #-------------------------------
 
-    # les joueurs sont numerotes de 0 à 13 (il y en a 14)
+    # les joueurs sont numerotes de 0 à N-1 (il y en a N)
     for p in range(len(players)):
         joueur_objectif.append(aleatoire(objectifs))
         print("Objectif joueur "+str(p)+" : "+str(joueur_objectif[p]))
@@ -153,7 +155,7 @@ def main():
                 players[p].set_rowcol(row, col)
                 #print ("pos "+str(p)+" : ", row, col)
                 if (row,col) == joueur_objectif[p]:
-                    print("le joueur "+str(p)+" a atteint son but!")
+                    #print("le joueur "+str(p)+" a atteint son but!")
                     but_atteint[p] = True
                     break
 
@@ -183,8 +185,8 @@ def main():
         matrice_resultats[goalStates.index(joueur_objectif[p])].append(p)
 
     # on considere que les nombre pairs sont le parti 1 et le reste parti 2
-    gagne_parti1 = 0
-    gagne_parti2 = 0
+    voix_parti1 = 0
+    voix_parti2 = 0
     for r in matrice_resultats:
         nombre_parti1 = 0
         nombre_parti2 = 0
@@ -194,16 +196,16 @@ def main():
             else:
                 nombre_parti2+=1
         if nombre_parti1 > nombre_parti2:
-            gagne_parti1+=1
+            voix_parti1+=1
         elif nombre_parti2 > nombre_parti1:
-            gagne_parti2+=1
+            voix_parti2+=1
 
-    print("le parti 1 a remporté "+str(gagne_parti1)+" voix")
-    print("le parti 2 a remporté "+str(gagne_parti2)+" voix")
+    print("le parti 1 a remporté "+str(voix_parti1)+" voix")
+    print("le parti 2 a remporté "+str(voix_parti2)+" voix")
 
-    if gagne_parti1 > gagne_parti2:
+    if voix_parti1 > voix_parti2:
         print("le gagnant est le parti 1")
-    elif gagne_parti1 < gagne_parti2:
+    elif voix_parti1 < voix_parti2:
         print("le gagnant est le parti 2")
     else:
         print("les deux partis sont à égalité")
@@ -216,7 +218,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-
-
-# Combien de partis ? combien de militants par parti ?
+    i = 0
+    while i < jours:
+        main()
+        time.sleep(2) # pour avoir le temps de regarder les resultats
+        i+=1
