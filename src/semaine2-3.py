@@ -48,16 +48,19 @@ def aleatoire(objectifs):
     """ Strategie aleatoire, retourne la position d'un electeur au hasard """
     return objectifs[random.randrange(0, len(objectifs))]
 
-def tetu(strats, objectifs, parti, joueur_objectif, jours):
+def tetu(strat, jours):
+    print(strat)
+    return [strat for x in range(jours+1)]
+
+def stochaExp(strats, jours):
     return 0
 
-def stochaExp(strats, objectifs, parti, joueur_objectif, jours):
-    return 0
+def bestResp(jours, joueur_objectif, parti):
+    #if parti == 1:
+    #    for i in range(0, len(joueur_objectif), 2):
 
-def bestAnswer(strats, objectifs, parti, joueur_objectif, jours):
-    return 0
 
-def fictitious(strats, objectifs, parti, joueur_objectif, jours):
+def fictitious(strats, jours):
     return 0
 
 def equitable(players, objectifs, parti, joueur_objectif):
@@ -111,66 +114,36 @@ def repartir_strategies(players, objectifs, strategie1, strategie2, joueur_objec
 
     #-------------------------------
     # Application des strategies des militants
-    # 0 = aleatoire
-    # 1 = tetu
-    # 2 = stochastique expert
-    # 3 = meilleure reponse
-    # 4 = fictitious play
-    # 5 = repartir de maniere equitable
-    # 6 = repartir tout sur les deux premiers electeurs uniquement
     #-------------------------------
 
     # les joueurs sont numerotes de 0 à N-1 (il y en a N)
     # les joueurs d'indice pair sont le premier parti, les impairs sont le second parti
+
     # STARTS PARTI1
-    if strategie1 == 0 :
+    if strategie1 == 'aleatoire' :
         for p in range(0, len(players), 2):
             joueur_objectif[p] = aleatoire(objectifs)
 
-    elif strategie1 == 1 :
-        joueur_objectif tetu(strats, objectifs, 1, joueur_objectif, jours)
-
-    elif strategie1 == 2 :
-        joueur_objectif stochaExp(strats, objectifs, 1, joueur_objectif, jours)
-
-    elif strategie1 == 3 :
-        joueur_objectif bestAnswer(strats, objectifs, 1, joueur_objectif, jours)
-
-    elif strategie1 == 4 :
-        joueur_objectif fictitious(strats, objectifs, 1, joueur_objectif, jours)
-
-    elif strategie1 == 5 :
+    elif strategie1 == 'equitable' :
         equitable(players, objectifs, 1, joueur_objectif)
 
-    elif strategie1 == 6 :
+    elif strategie1 == 'deuxPrem' :
         deuxPrem(objectifs, 1, joueur_objectif)
 
 
     # STARTS PARTI2
 
-    if strategie2 == 0 :
+    if strategie2 == 'aleatoire' :
         for p in range(1, len(players), 2):
             joueur_objectif[p] = aleatoire(objectifs)
 
-    elif strategie2 == 1 :
-        joueur_objectif tetu(strats, objectifs, 2, joueur_objectif, jours)
-
-    elif strategie2 == 2 :
-        joueur_objectif stochaExp(strats, objectifs, 2, joueur_objectif, jours)
-
-    elif strategie2 == 3 :
-        joueur_objectif bestAnswer(strats, objectifs, 2, joueur_objectif, jours)
-
-    elif strategie2 == 4 :
-        joueur_objectif fictitious(strats, objectifs, 2, joueur_objectif, jours)
-
-    elif strategie2 == 5 :
+    elif strategie2 == 'equitable' :
         equitable(players, objectifs, 2, joueur_objectif)
 
-    elif strategie2 == 6 :
+    elif strategie2 == 'deuxPrem' :
         deuxPrem(objectifs, 2, joueur_objectif)
 
-def jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, strategie1, strategie2):
+def jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, strategie1, strategie2, joueurs_objectif):
     def legal_position(row,col):
         # une position legale est dans la carte et pas sur un mur
         return ((row,col) not in wallStates) and row>=0 and row<nbLignes and col>=0 and col<nbCols
@@ -280,7 +253,7 @@ def jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStat
 
     return win
 
-def main(tableau_strategies, jours):
+def main(tableau_strategies, jours, joueur_objectif):
     tableau_score = [] # chaque indice est le numéro du jour-1
     i = 0
     while i < jours:
@@ -323,7 +296,7 @@ def main(tableau_strategies, jours):
             wallStates = [w.get_rowcol() for w in game.layers['obstacle']]
             print ("Wall states:", wallStates)
 
-        tableau_score.append(jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, tableau_strategies[0][i], tableau_strategies[1][i]))
+        tableau_score.append(jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, tableau_strategies[0][i], tableau_strategies[1][i], joueur_objectif))
         time.sleep(2) # pour avoir le temps de regarder les resultats
         i+=1
 
@@ -332,10 +305,22 @@ def main(tableau_strategies, jours):
 
 if __name__ == '__main__':
 
+    joueur_objectif = []
     jours = 5
 
+    # comparaison de plusieurs strategies
+
+    # tetu vs aleatoire
     tableau_strategies = [[], []]
-    tableau_strategies[0] = [5 for x in range(jours+1)]
-    tableau_strategies[1] = [5 for x in range(jours+1)]
-    tableau_score = main(tableau_strategies, jours)
+    tableau_strategies[0] = tetu('equitable', jours)
+    tableau_strategies[1] = ['aleatoire' for x in range(jours+1)]
+    tableau_score = main(tableau_strategies, jours, joueur_objectif)
+    print(tableau_score)
+
+    # meilleure reponse contre stochastique expert
+    tableau_strategies = [[], []]
+    tableau_strategies[0] = tetu('equitable', jours)
+    tableau_strategies[1][0] = 'equitable' # la premiere strategie ne peut pas dependre des precedentes alors on choisit ici une arbitrairement
+    tableau_strategies[1][0:] = [bestResp(jours, joueur_objectif, 2) for x in range(0, jours+1)]
+    tableau_score = main(tableau_strategies, jours, joueur_objectif)
     print(tableau_score)
