@@ -36,7 +36,6 @@ from search import probleme
 # ---- Main                ----
 # ---- ---- ---- ---- ---- ----
 
-jours = 5
 game = Game()
 
 def init(_boardname=None):
@@ -92,56 +91,12 @@ def equitable(players, objectifs):
 def deuxPrem(objectifs):
     return 0
 
-def main(electeurs, militants, strategie):
+def jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, strategie):
+    def legal_position(row,col):
+        # une position legale est dans la carte et pas sur un mur
+        return ((row,col) not in wallStates) and row>=0 and row<nbLignes and col>=0 and col<nbCols
 
-    #for arg in sys.argv:
-    iterations = 100 # default
-    if len(sys.argv) == 2:
-        iterations = int(sys.argv[1])
-    print ("Iterations: ")
-    print (iterations)
-
-    init()
-
-    #-------------------------------
-    # Initialisation
-    #-------------------------------
-    # condition juste pour masquer le bloc dans l'editeur, inutile au programme
-    if 1==1:
-        nbLignes = game.spriteBuilder.rowsize
-        nbCols = game.spriteBuilder.colsize
-
-        print("lignes", nbLignes)
-        print("colonnes", nbCols)
-
-
-        players = [o for o in game.layers['joueur']]
-        nbPlayers = len(players)
-        print("Trouvé ", nbPlayers, " militants")
-
-
-
-        # on localise tous les états initiaux (loc du joueur)
-        # positions initiales des joueurs
-        initStates = [o.get_rowcol() for o in players]
-        print ("Init states:", initStates)
-
-        # on localise tous les secteurs d'interet (les votants)
-        # sur le layer ramassable
-        goalStates = [o.get_rowcol() for o in game.layers['ramassable']]
-        print ("Goal states:", goalStates)
-
-
-        # on localise tous les murs
-        # sur le layer obstacle
-        wallStates = [w.get_rowcol() for w in game.layers['obstacle']]
-        print ("Wall states:", wallStates)
-
-        def legal_position(row,col):
-            # une position legale est dans la carte et pas sur un mur
-            return ((row,col) not in wallStates) and row>=0 and row<nbLignes and col>=0 and col<nbCols
-
-    objectifs = electeurs
+    objectifs = goalStates
     joueur_objectif = []
 
     #-------------------------------
@@ -177,9 +132,6 @@ def main(electeurs, militants, strategie):
 
     elif strategie == 6 :
         joueur_objectif.append(deuxPrem(objectifs))
-
-    elif strategie == 7 :
-        joueur_objectif.append(aleatoire(objectifs))
 
     print("Objectif joueur "+str(p)+" : "+str(joueur_objectif[p]))
 
@@ -268,21 +220,72 @@ def main(electeurs, militants, strategie):
     print("le parti 1 a remporté "+str(voix_parti1)+" voix")
     print("le parti 2 a remporté "+str(voix_parti2)+" voix")
 
+    win = 0
+
     if voix_parti1 > voix_parti2:
         print("le gagnant est le parti 1")
+        win = 1
     elif voix_parti1 < voix_parti2:
         print("le gagnant est le parti 2")
+        win = 2
     else:
         print("les deux partis sont à égalité")
 
-
     #-------------------------------
 
+    return win
 
-if __name__ == '__main__':
+def main(tableau_strategies):
+    tableau_score = [] # chaque indice est le numéro du jour-1
+    jours = 5
     i = 0
-    electeurs =
     while i < jours:
-        main(electeurs, militants, strategie)
+        #for arg in sys.argv:
+        iterations = 100 # default
+        if len(sys.argv) == 2:
+            iterations = int(sys.argv[1])
+        print ("Iterations: ")
+        print (iterations)
+
+        init()
+
+        #-------------------------------
+        # Initialisation
+        #-------------------------------
+        # condition juste pour masquer le bloc dans l'editeur, inutile au programme
+        if 1==1:
+            nbLignes = game.spriteBuilder.rowsize
+            nbCols = game.spriteBuilder.colsize
+
+            print("lignes", nbLignes)
+            print("colonnes", nbCols)
+
+            players = [o for o in game.layers['joueur']]
+            nbPlayers = len(players)
+            print("Trouvé ", nbPlayers, " militants")
+
+            # on localise tous les états initiaux (loc du joueur)
+            # positions initiales des joueurs
+            initStates = [o.get_rowcol() for o in players]
+            print ("Init states:", initStates)
+
+            # on localise tous les secteurs d'interet (les votants)
+            # sur le layer ramassable
+            goalStates = [o.get_rowcol() for o in game.layers['ramassable']]
+            print ("Goal states:", goalStates)
+
+            # on localise tous les murs
+            # sur le layer obstacle
+            wallStates = [w.get_rowcol() for w in game.layers['obstacle']]
+            print ("Wall states:", wallStates)
+
+        tableau_score.append(jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, tableau_strategies[i]))
         time.sleep(2) # pour avoir le temps de regarder les resultats
         i+=1
+
+        print("\n------------- FIN DE LA CAMPAGNE - RESULTATS -------------\n")
+        print(tableau_score)
+
+if __name__ == '__main__':
+    tableau_strategies = [0 for x in range(6)]
+    main(tableau_strategies)
