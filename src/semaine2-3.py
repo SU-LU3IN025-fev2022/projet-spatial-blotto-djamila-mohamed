@@ -48,16 +48,16 @@ def aleatoire(objectifs):
     """ Strategie aleatoire, retourne la position d'un electeur au hasard """
     return objectifs[random.randrange(0, len(objectifs))]
 
-def tetu(strats, objectifs, parti, joueur_objectif):
+def tetu(strats, objectifs, parti, joueur_objectif, jours):
     return 0
 
-def stochaExp(strats, objectifs, parti, joueur_objectif):
+def stochaExp(strats, objectifs, parti, joueur_objectif, jours):
     return 0
 
-def bestAnswer(strats, objectifs, parti, joueur_objectif):
+def bestAnswer(strats, objectifs, parti, joueur_objectif, jours):
     return 0
 
-def fictitious(strats, objectifs, parti, joueur_objectif):
+def fictitious(strats, objectifs, parti, joueur_objectif, jours):
     return 0
 
 def equitable(players, objectifs, parti, joueur_objectif):
@@ -93,7 +93,19 @@ def equitable(players, objectifs, parti, joueur_objectif):
     return res
 
 def deuxPrem(objectifs, parti, joueur_objectif):
-    return 0
+    """ Strategie deux premiers, repartit les militants uniquement sur les deux premiers electeurs"""
+    if parti == 1:
+        for i in range(0, len(joueur_objectif), 2):
+            if i%2 == 0:
+                joueur_objectif[i] = objectifs[0]
+            else:
+                joueur_objectif[i] = objectifs[1]
+    else:
+        for i in range(1, len(joueur_objectif), 2):
+            if i%2 == 0:
+                joueur_objectif[i] = objectifs[0]
+            else:
+                joueur_objectif[i] = objectifs[1]
 
 def repartir_strategies(players, objectifs, strategie1, strategie2, joueur_objectif):
 
@@ -109,28 +121,29 @@ def repartir_strategies(players, objectifs, strategie1, strategie2, joueur_objec
     #-------------------------------
 
     # les joueurs sont numerotes de 0 à N-1 (il y en a N)
+    # les joueurs d'indice pair sont le premier parti, les impairs sont le second parti
     # STARTS PARTI1
     if strategie1 == 0 :
         for p in range(0, len(players), 2):
             joueur_objectif[p] = aleatoire(objectifs)
 
     elif strategie1 == 1 :
-        joueur_objectif.append(tetu(objectifs, 1))
+        joueur_objectif tetu(strats, objectifs, 1, joueur_objectif, jours)
 
     elif strategie1 == 2 :
-        joueur_objectif.append(stochaExp(objectifs, 1))
+        joueur_objectif stochaExp(strats, objectifs, 1, joueur_objectif, jours)
 
     elif strategie1 == 3 :
-        joueur_objectif.append(bestAnswer(objectifs, 1))
+        joueur_objectif bestAnswer(strats, objectifs, 1, joueur_objectif, jours)
 
     elif strategie1 == 4 :
-        joueur_objectif.append(fictitious(objectifs, 1))
+        joueur_objectif fictitious(strats, objectifs, 1, joueur_objectif, jours)
 
     elif strategie1 == 5 :
         equitable(players, objectifs, 1, joueur_objectif)
 
     elif strategie1 == 6 :
-        joueur_objectif.append(deuxPrem(objectifs, 1))
+        deuxPrem(objectifs, 1, joueur_objectif)
 
 
     # STARTS PARTI2
@@ -140,22 +153,22 @@ def repartir_strategies(players, objectifs, strategie1, strategie2, joueur_objec
             joueur_objectif[p] = aleatoire(objectifs)
 
     elif strategie2 == 1 :
-        joueur_objectif.append(tetu(objectifs, 2))
+        joueur_objectif tetu(strats, objectifs, 2, joueur_objectif, jours)
 
     elif strategie2 == 2 :
-        joueur_objectif.append(stochaExp(objectifs, 2))
+        joueur_objectif stochaExp(strats, objectifs, 2, joueur_objectif, jours)
 
     elif strategie2 == 3 :
-        joueur_objectif.append(bestAnswer(objectifs, 2))
+        joueur_objectif bestAnswer(strats, objectifs, 2, joueur_objectif, jours)
 
     elif strategie2 == 4 :
-        joueur_objectif.append(fictitious(objectifs, 2))
+        joueur_objectif fictitious(strats, objectifs, 2, joueur_objectif, jours)
 
     elif strategie2 == 5 :
         equitable(players, objectifs, 2, joueur_objectif)
 
     elif strategie2 == 6 :
-        joueur_objectif.append(deuxPrem(objectifs, 2))
+        deuxPrem(objectifs, 2, joueur_objectif)
 
 def jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, strategie1, strategie2):
     def legal_position(row,col):
@@ -315,7 +328,7 @@ def main(tableau_strategies, jours):
         i+=1
 
         print("\n------------- FIN DE LA CAMPAGNE - RESULTATS -------------\n")
-        print(tableau_score)
+    return tableau_score
 
 if __name__ == '__main__':
 
@@ -323,5 +336,6 @@ if __name__ == '__main__':
 
     tableau_strategies = [[], []]
     tableau_strategies[0] = [5 for x in range(jours+1)]
-    tableau_strategies[1] = [0 for x in range(jours+1)]
-    main(tableau_strategies, jours)
+    tableau_strategies[1] = [5 for x in range(jours+1)]
+    tableau_score = main(tableau_strategies, jours)
+    print(tableau_score)
