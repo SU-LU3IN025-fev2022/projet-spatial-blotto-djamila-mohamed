@@ -56,7 +56,43 @@ def aleatoire(objectifs):
 def tetu(strats, objectifs):
     return 0
 
-def main():
+def stochaExp(strats, objectifs):
+    return 0
+
+def bestAnswer(strats, objectifs):
+    return 0
+
+def fictitious(strats, objectifs):
+    return 0
+
+def equitable(players, objectifs):
+    """ Strategie equitable, repartit les militants de manière equitable sur les electeurs """
+    repartition = [[x] for x in objectifs]
+    div = len(players) // len(objectifs)
+    rem = len(players) % len(objectifs)
+    joueurs_pris = []
+    joueurs = random.sample(players, len(players))
+    print(joueurs)
+    i = 0
+    o = 0
+    nb_joueurs = 0
+    while i < len(joueurs):
+        print("i = "+str(i)+ " : o = "+str(o))
+        print("joueur actuel : " + str(joueurs[i]))
+        repartition[o].append(joueurs[i])
+        i+=1
+        nb_joueurs+=1
+        if o == len(objectifs) - 1:
+            continue
+        if nb_joueurs >= div:
+            o+=1
+            nb_joueurs = 0
+    return repartition
+
+def deuxPrem(objectifs):
+    return 0
+
+def main(electeurs, militants, strategie):
 
     #for arg in sys.argv:
     iterations = 100 # default
@@ -66,7 +102,6 @@ def main():
     print (iterations)
 
     init()
-
 
     #-------------------------------
     # Initialisation
@@ -106,17 +141,47 @@ def main():
             # une position legale est dans la carte et pas sur un mur
             return ((row,col) not in wallStates) and row>=0 and row<nbLignes and col>=0 and col<nbCols
 
-    objectifs = goalStates
+    objectifs = electeurs
     joueur_objectif = []
 
     #-------------------------------
     # Application des strategies des militants
+    # 0 = aleatoire
+    # 1 = tetu
+    # 2 = stochastique expert
+    # 3 = meilleure reponse
+    # 4 = fictitious play
+    # 5 = repartir de maniere equitable
+    # 6 = repartir tout sur les deux premiers electeurs uniquement
     #-------------------------------
 
     # les joueurs sont numerotes de 0 à N-1 (il y en a N)
-    for p in range(len(players)):
+    if strategie == 0 :
+        for p in range(len(players)):
+            joueur_objectif.append(aleatoire(objectifs))
+
+    elif strategie == 1 :
+        joueur_objectif.append(tetu(objectifs))
+
+    elif strategie == 2 :
+        joueur_objectif.append(stochaExp(objectifs))
+
+    elif strategie == 3 :
+        joueur_objectif.append(bestAnswer(objectifs))
+
+    elif strategie == 4 :
+        joueur_objectif.append(fictitious(objectifs))
+
+    elif strategie == 5 :
+        joueur_objectif.append(equitable(objectifs))
+
+    elif strategie == 6 :
+        joueur_objectif.append(deuxPrem(objectifs))
+
+    elif strategie == 7 :
         joueur_objectif.append(aleatoire(objectifs))
-        print("Objectif joueur "+str(p)+" : "+str(joueur_objectif[p]))
+
+    print("Objectif joueur "+str(p)+" : "+str(joueur_objectif[p]))
 
 
     #-------------------------------
@@ -216,7 +281,8 @@ def main():
 
 if __name__ == '__main__':
     i = 0
+    electeurs =
     while i < jours:
-        main()
+        main(electeurs, militants, strategie)
         time.sleep(2) # pour avoir le temps de regarder les resultats
         i+=1
