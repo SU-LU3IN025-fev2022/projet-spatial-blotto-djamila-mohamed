@@ -40,7 +40,7 @@ def init(_boardname=None):
     game = Game('./Cartes/' + name + '.json', SpriteBuilder)
     game.O = Ontology(True, 'SpriteSheet-32x32/tiny_spritesheet_ontology.csv')
     game.populate_sprite_names(game.O)
-    game.fps = 40  # frames per second
+    game.fps = 120  # frames per second
     game.mainiteration()
     player = game.player
 
@@ -55,9 +55,43 @@ def tetu(strat, jours):
 def stochaExp(strats, jours):
     return 0
 
-def bestResp(jours, joueur_objectif, parti):
-    #if parti == 1:
-    #    for i in range(0, len(joueur_objectif), 2):
+def bestResp(objectifs, joueur_objectif, parti_adverse):
+    # Initialisation
+    # pion = militant
+    pions1 = [[x] for x in objectifs] # on associe à chaque objectif les joueurs qui sont dessus. pions du parti1
+    pions2 = [[x] for x in objectifs] # on va les comparer un à un, pions du parti2
+    for i in range(0, len(joueur_objectif), 2): # i = numéro du joueur
+        pions1[pions1.index(joueur_objectif[i])][0]+=1 # on incremente le nombre de militants presents a cet endroit
+    for i in range(1, len(joueur_objectif), 2):
+        pions2[pions2.index(joueur_objectif[i])][0]+=1
+
+    # trier les electeurs par ordre croissant du nombre de militants pour chaque parti
+    def f(val):
+        return val[1]
+    pions1.sort(key=f)
+    pions2.sort(key=f)
+
+    # Debut de l'algorithme
+    m = len(joueur_objectif)//2 # on commence avec m militants à repartir
+    if parti_adverse == 1:
+        for i in pions2:
+            if m >= 0: # tant qu'on a des militants
+                pions2[i][1] += pions1[i][0] + 1 # on pose un militant de plus que l'adversaire
+                m -= 1
+
+        # on met a jour la liste des objectifs de chaque militant du parti 2
+        i = 0
+        while i < len(joueur_objectif):
+            for obj in pions2:
+                if i < pions2[obj][1]:
+                    joueur_objectif[i] = objectifs[obj]
+                    i += 1
+
+    elif parti_adverse == 2:
+        for i in pions1:
+            if m >= 0: # tant qu'on a des militants
+                pions1[i][1] += pions2[i][0] + 1 # on pose un militant de plus que l'adversaire
+                m -= 1
 
 
 def fictitious(strats, jours):
@@ -130,6 +164,8 @@ def repartir_strategies(players, objectifs, strategie1, strategie2, joueur_objec
     elif strategie1 == 'deuxPrem' :
         deuxPrem(objectifs, 1, joueur_objectif)
 
+    elif strategie1 == 'bestResp' :
+        bestResp(objectifs, joueur_objectif, 1)
 
     # STARTS PARTI2
 
@@ -142,6 +178,9 @@ def repartir_strategies(players, objectifs, strategie1, strategie2, joueur_objec
 
     elif strategie2 == 'deuxPrem' :
         deuxPrem(objectifs, 2, joueur_objectif)
+
+    elif strategie2 == 'bestResp' :
+        bestResp(objectifs, joueur_objectif, 1)
 
 def jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, strategie1, strategie2, joueurs_objectif):
     def legal_position(row,col):
@@ -297,7 +336,7 @@ def main(tableau_strategies, jours, joueur_objectif):
             print ("Wall states:", wallStates)
 
         tableau_score.append(jour(iterations, nbLignes, nbCols, players, goalStates, initStates, wallStates, tableau_strategies[0][i], tableau_strategies[1][i], joueur_objectif))
-        time.sleep(2) # pour avoir le temps de regarder les resultats
+        # time.sleep(2) # pour avoir le temps de regarder les resultats
         i+=1
 
         print("\n------------- FIN DE LA CAMPAGNE - RESULTATS -------------\n")
@@ -318,9 +357,7 @@ if __name__ == '__main__':
     print(tableau_score)
 
     # meilleure reponse contre stochastique expert
-    tableau_strategies = [[], []]
-    tableau_strategies[0] = tetu('equitable', jours)
-    tableau_strategies[1][0] = 'equitable' # la premiere strategie ne peut pas dependre des precedentes alors on choisit ici une arbitrairement
-    tableau_strategies[1][0:] = [bestResp(jours, joueur_objectif, 2) for x in range(0, jours+1)]
-    tableau_score = main(tableau_strategies, jours, joueur_objectif)
-    print(tableau_score)
+    #tableau_strategies = [[], []]
+    #tableau_strategies[0] = tetu('equitable', jours)
+    #tableau_score = main(tableau_strategies, jours, joueur_objectif)
+    #print(tableau_score)
